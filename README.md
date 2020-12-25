@@ -28,5 +28,12 @@
     php artisan db:seed
 ```
 
+# USED IMPLEMENTATIONS
+
+-   [Laravel Fortify](https://laravel.com/docs/8.x/fortify)
+-   [Laravel Sanctum](https://laravel.com/docs/8.x/sanctum)
+
+# OTHER PACKAGES INSTALLED
+
 -   [LARAVEL-ROLES](https://github.com/jeremykenedy/laravel-roles)
 -   [FAKER](https://fakerphp.github.io)
