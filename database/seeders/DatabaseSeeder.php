@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
         if(env('APP_DEBUG'))
         $this->call([
+            UserSeeder::class,
             CompanySeeder::class,
         ]);
     }
