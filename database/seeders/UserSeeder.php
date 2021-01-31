@@ -14,11 +14,12 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-
-        User::firstOrNew([
-            'name' => 'Agustin Jimenez',
-            'email' => 'agus.jimenez.caba@gmail.com',
-            'password' => '12345678',
-        ]);
+        User::where('email', 'agus.jimenez.caba@gmail.com')->firstOr(function () {
+            User::create([
+                'name' => 'Agustin Jimenez',
+                'email' => 'agus.jimenez.caba@gmail.com',
+                'password' => '12345678',
+            ]);
+        });
     }
 }

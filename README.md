@@ -28,6 +28,18 @@
     php artisan db:seed
 ```
 
+# SERVE
+
+```
+    php artisan serve --host 0.0.0.0
+```
+
+# SERVE WITH YARN
+
+```
+    yarn start
+```
+
 # USED IMPLEMENTATIONS
 
 -   [Laravel Fortify](https://laravel.com/docs/8.x/fortify)
