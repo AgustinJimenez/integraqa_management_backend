@@ -38,14 +38,16 @@ class Testphp extends Command
      */
     public function handle()
     {
-        $user = User::firstOrNew([
-            'name' => 'Agustin Jimenez',
-            'email' => 'agus.jimenez.caba@gmail.com',
-            'password' => '12345678',
+        $user = User::where('email', 'agus.jimenez.caba@gmail.com')->firstOr(function () {
+            User::create([
+                'name' => 'Agustin Jimenez',
+                'email' => 'agus.jimenez.caba@gmail.com',
+                'password' => '12345678',
+            ]);
+        });
+        dd([
+            $user->toArray() ?? 'no',
         ]);
-        dd(
-            $user->toArray()
-        );
 
         return 0;
     }

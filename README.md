@@ -28,6 +28,12 @@
     php artisan db:seed
 ```
 
+# GENERATE JWT TOKEN
+
+```
+php artisan jwt:secret
+```
+
 # SERVE
 
 ```
