@@ -46,12 +46,12 @@ php artisan jwt:secret
     yarn start
 ```
 
-# USED IMPLEMENTATIONS
+### USE [MAILHOG](https://github.com/mailhog/MailHog)
 
--   [Laravel Fortify](https://laravel.com/docs/8.x/fortify)
--   [Laravel Sanctum](https://laravel.com/docs/8.x/sanctum)
+### [MAILHOG WEB](http://localhost:8025)
 
-# OTHER PACKAGES INSTALLED
+### START MAILHOG (FROM COMMAND LINE)
 
--   [LARAVEL-ROLES](https://github.com/jeremykenedy/laravel-roles)
--   [FAKER](https://fakerphp.github.io)
+```
+mailhog
+```

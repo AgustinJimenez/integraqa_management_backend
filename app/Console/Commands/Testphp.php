@@ -2,8 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Repositories\MailRepository;
+use App\Mail\UserRegisterConfirmation;
 use Illuminate\Console\Command;
-use App\Models\User;
+use App\Models\{User};
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class Testphp extends Command
 {
@@ -38,16 +42,11 @@ class Testphp extends Command
      */
     public function handle()
     {
-        $user = User::where('email', 'agus.jimenez.caba@gmail.com')->firstOr(function () {
-            User::create([
-                'name' => 'Agustin Jimenez',
-                'email' => 'agus.jimenez.caba@gmail.com',
-                'password' => '12345678',
-            ]);
-        });
-        dd([
-            $user->toArray() ?? 'no',
-        ]);
+        $user = User::find(1);
+        
+        MailRepository::sendEmailConfirmation($user);
+
+        dd('YES');
 
         return 0;
     }

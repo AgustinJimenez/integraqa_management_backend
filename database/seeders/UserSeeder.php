@@ -19,6 +19,7 @@ class UserSeeder extends Seeder
                 'name' => 'Agustin Jimenez',
                 'email' => 'agus.jimenez.caba@gmail.com',
                 'password' => '12345678',
+                'enabled' => true
             ]);
         });
     }
