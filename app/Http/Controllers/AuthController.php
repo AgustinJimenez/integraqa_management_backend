@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Repositories\MailRepository;
 
 class AuthController extends Controller
 {
@@ -16,7 +17,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'emailConfirmation']]);
+        $this->middleware('auth:api', ['except' => ['login', 'emailConfirmation', 'register']]);
     }
 
     /**
@@ -28,9 +29,19 @@ class AuthController extends Controller
     {
         $credentials = request(['email', 'password']);
 
-        if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
+        $user = User::where('email', $credentials['email'])->first();
+
+        if(!$user)
+            return abort(400, 'user_doesnt_exists');
+        else if(!$user->enabled)
+            return abort(400, 'user_is_unabled');
+        else if(!$user->email_verified_at)
+            return abort(400, 'user_is_not_verified');
+            
+
+        if (! $token = auth()->attempt($credentials))
+            return abort(401, 'invalid_credentials');
+        
 
         return $this->respondWithToken($token);
     }
@@ -87,7 +98,8 @@ class AuthController extends Controller
 
         $data = $request->only([ 'name', 'email', 'password' ]);
         User::validate( $data );
-        User::create( $data );
+        $user = User::create( $data );
+        MailRepository::sendEmailConfirmation($user);
     }
 
     public function emailConfirmation(Request $request){
