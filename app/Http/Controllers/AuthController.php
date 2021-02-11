@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class AuthController extends Controller
 {
@@ -15,7 +16,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['except' => ['login', 'emailConfirmation']]);
     }
 
     /**
@@ -88,4 +89,20 @@ class AuthController extends Controller
         User::validate( $data );
         User::create( $data );
     }
+
+    public function emailConfirmation(Request $request){
+        $verification_code = $request->only('verification_code');
+        $user = User::where([
+            ['email_verification_token', $verification_code]
+        ])
+        ->firstOrFail();
+        
+        if($user->email_verified_at)
+            return abort(400, 'user_is_already_verified');
+        
+        $user->update([
+            'email_verified_at' => now()->toDateTimeString() ,
+        ]);    
+    }
+
 }
