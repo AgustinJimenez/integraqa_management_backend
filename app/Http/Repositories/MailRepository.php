@@ -8,9 +8,15 @@ class MailRepository {
 
     public static function sendEmailConfirmation(User $user) {
 
-        $message = (new UserRegisterConfirmation($user))->onQueue('emails');
+        try {
 
-        Mail::to($user)->queue($message);
+            $message = (new UserRegisterConfirmation($user))->onQueue('emails');
+
+            Mail::to($user)->queue($message);
+
+        } catch (\Exception $error) {
+            abort(500, 'cant_send_confirmation_email');
+        }
     }
 
 }

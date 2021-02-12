@@ -119,9 +119,8 @@ class User extends Authenticatable implements JWTSubject
     public static function validate(array $data): void {
 
         $validator = Validator::make($data, self::$rules );
-
         if($validator->fails())
-            abort(401, $validator->errors() );
+            abort(400, $validator->errors()->first() );
     }
 
 }

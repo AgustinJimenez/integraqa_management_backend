@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\MailRepository;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -33,10 +34,10 @@ class AuthController extends Controller
 
         if(!$user)
             return abort(400, 'user_doesnt_exists');
-        else if(!$user->enabled)
-            return abort(400, 'user_is_unabled');
         else if(!$user->email_verified_at)
             return abort(400, 'user_is_not_verified');
+        else if(!$user->enabled)
+            return abort(400, 'user_is_unabled');
             
 
         if (! $token = auth()->attempt($credentials))
@@ -98,8 +99,13 @@ class AuthController extends Controller
 
         $data = $request->only([ 'name', 'email', 'password' ]);
         User::validate( $data );
+
+        DB::beginTransaction();
+
         $user = User::create( $data );
         MailRepository::sendEmailConfirmation($user);
+
+        DB::commit();
     }
 
     public function emailConfirmation(Request $request){
