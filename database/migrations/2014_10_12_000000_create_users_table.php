@@ -19,11 +19,10 @@ class CreateUsersTable extends Migration
             $table->string('name', 120);
             $table->string('email', 90)->unique();
             $table->string('image', 160)->nullable();
-            $table->string('utr', 12)->nullable();
+            $table->string('utr', 12)->nullable()->comment('Unique Taxpayer Reference');
             $table->string('password');
             $table->boolean('enabled')->default(false);
             $table->rememberToken();
-            $table->string('email_verification_token', 30)->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();
         });

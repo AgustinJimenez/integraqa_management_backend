@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\MailRepository;
+use App\Models\VerificationToken;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -18,7 +19,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'emailConfirmation', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'emailConfirmation', 'register', 'passwordRecovery', 'passwordResetCodeCheck', 'passwordReset']]);
     }
 
     /**
@@ -109,10 +110,12 @@ class AuthController extends Controller
     }
 
     public function emailConfirmation(Request $request){
-        $verification_code = $request->only('verification_code');
-        $user = User::where([
-            ['email_verification_token', $verification_code]
-        ])
+        $verification_code = $request->get('verification_code');
+        $user = User::whereHas('verification_tokens', function($verification_token_table) use (&$verification_code){
+            $verification_token_table->where('value', $verification_code)
+            ->where('type', VerificationToken::$types['user_email_verification'] )
+            ->IsNotExpired();
+        })
         ->firstOrFail();
         
         if($user->email_verified_at)
@@ -121,6 +124,64 @@ class AuthController extends Controller
         $user->update([
             'email_verified_at' => now()->toDateTimeString() ,
         ]);    
+    }
+
+    public function passwordRecovery(Request $request){
+
+        $email = $request->get('email');
+        $user = User::where([
+            ['email', $email]
+        ])
+        ->firstOrFail();
+
+        VerificationToken::bindNewUniqueToken($user, VerificationToken::$types['user_password_recovery']);
+
+        MailRepository::sendPasswordRecoveryEmail($user);
+    }
+
+    public function passwordResetCodeCheck(Request $request){
+        $reset_code = $request->get('reset_code');
+        VerificationToken::where([
+            ['value', $reset_code],
+            ['type', VerificationToken::$types['user_password_recovery']]
+        ])
+        ->isNotExpired()
+        ->firstOrFail();
+    }
+
+    public function passwordReset(Request $request){
+
+        $new_password = $request->get('new_password');
+        $reset_code = $request->get('reset_code');
+
+        $validator = Validator::make( compact('new_password'), ['new_password' => ['bail', 'required', "min:6"]] );
+        
+        if($validator->fails())
+            abort(400, $validator->errors()->first() );
+
+        \DB::beginTransaction();
+
+        $verification_code = VerificationToken::with('entity')
+        ->where([
+            ['value', $reset_code],
+            ['type', VerificationToken::$types['user_password_recovery']]
+        ])
+        ->isNotExpired()
+        ->firstOrFail();
+
+        $user = $verification_code->entity;
+        
+        $user->password = $new_password;
+
+        $user->update();
+
+        VerificationToken::where([
+            ['entity_id', $user->id],
+            ['type', VerificationToken::$types['user_password_recovery']]
+        ])
+        ->delete();
+
+        \DB::commit();
     }
 
 }

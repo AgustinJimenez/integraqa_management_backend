@@ -26,4 +26,8 @@ Route::group([
     Route::get('me', [AuthController::class, 'me']);
     Route::post('register', [AuthController::class, 'register']);
     Route::post('email_confirmation', [AuthController::class, 'emailConfirmation']);
+    Route::post('password_recovery', [AuthController::class, 'passwordRecovery']);
+    Route::post('password_reset_code_check', [AuthController::class, 'passwordResetCodeCheck']);
+    Route::post('password_reset', [AuthController::class, 'passwordReset']);
+    
 });

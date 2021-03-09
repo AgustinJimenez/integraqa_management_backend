@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailable;
 use App\Models\User;
 use Illuminate\Queue\SerializesModels;
 
-class UserRegisterConfirmation extends Mailable
+class UserPasswordRecovery extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -35,12 +35,12 @@ class UserRegisterConfirmation extends Mailable
     {
         $user = $this->user;
         $verification_token = $this->verification_token;
-        $link = env('APP_FRONTEND_URL') . "/" . "email_confirmation/?vc=" .  $verification_token;
+        $link = env('APP_FRONTEND_URL') . "/" . "password_reset/?rc=" .  $verification_token;
 
         return $this
             ->from( env('MAIL_FROM_ADDRESS', 'no-mail') )
             ->to($user->email)
-            ->view("emails/user_register_confirmation")
+            ->view("emails/user_password_recovery_confirmation")
             ->with(compact('user', 'link'));
     }
 }

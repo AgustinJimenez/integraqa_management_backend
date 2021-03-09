@@ -7,7 +7,7 @@
         <title>Email</title>
     </head>
     <body>
-        <h2>Welcome to Integra QA {{ $user->name }}!</h2>
-        <p>This is your confirmation link: <a href="{{$link}}">{{  $link }}</a> </p>
+        <h2>Hello {{ $user->name }}!</h2>
+        <p>This is your password recovery link for the Integra QA system: <a href="{{$link}}">{{  $link }}</a> </p>
     </body>
 </html>

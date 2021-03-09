@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Http\Repositories\MailRepository;
 use App\Mail\UserRegisterConfirmation;
 use Illuminate\Console\Command;
-use App\Models\{User};
+use App\Models\{User, VerificationToken};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -42,11 +42,8 @@ class Testphp extends Command
      */
     public function handle()
     {
-        $user = User::find(1);
-        
-        MailRepository::sendEmailConfirmation($user);
-
-        dd('YES');
+        $user = User::first();
+        $user->verification_tokens()->delete();
 
         return 0;
     }

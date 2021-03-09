@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-
+use App\Models\{VerificationToken};
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
@@ -27,7 +27,6 @@ class User extends Authenticatable implements JWTSubject
         'image',
         'utr',
         'enabled',
-        'email_verification_token',
         'email_verified_at'
     ];
 
@@ -65,16 +64,13 @@ class User extends Authenticatable implements JWTSubject
 
         parent::boot();
 
-        static::creating(function ($user) {
-            $exists = true;
-            $email_verification_token = '';
+        static::created(function ($user) {
 
-            while($exists) {
-                $email_verification_token = Str::random(30);
-                $exists = User::where('email_verification_token', $email_verification_token)->exists();
-            }
+            VerificationToken::bindNewUniqueToken($user, VerificationToken::$types['user_email_verification']);
 
-            $user->email_verification_token = $email_verification_token;
+        }); 
+        static::deleting(function ($user) {
+            $user->verification_tokens()->delete();
         });
         
         /*
@@ -89,9 +85,7 @@ class User extends Authenticatable implements JWTSubject
         static::updating(function ($note) {
             logger()->info("note updating!!!");
         });
-        static::deleting(function ($evaluation) {
 
-        });
         */
         
     }
@@ -121,6 +115,11 @@ class User extends Authenticatable implements JWTSubject
         $validator = Validator::make($data, self::$rules );
         if($validator->fails())
             abort(400, $validator->errors()->first() );
+    }
+
+    public function verification_tokens()
+    {
+        return $this->morphMany(VerificationToken::class, 'entity');
     }
 
 }
