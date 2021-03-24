@@ -42,8 +42,14 @@ class Testphp extends Command
      */
     public function handle()
     {
-        $user = User::first();
-        $user->verification_tokens()->delete();
+        $users = User::
+        paginate(5)
+        ->toArray()
+        ;
+
+        dd(
+            $users
+        );
 
         return 0;
     }
