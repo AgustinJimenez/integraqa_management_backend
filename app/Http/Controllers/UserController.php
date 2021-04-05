@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Repositories\TableRepository;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -13,11 +14,12 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::
-        take(5)
-        ->paginate(5);
+        $rows_per_page = $request->get('rows_per_page', 5);
+        $page_number = $request->get('page_number', 1);
+        
+        $users = TableRepository::paginate( User::query(), compact('rows_per_page', 'page_number'));
 
         return $users;
     }
